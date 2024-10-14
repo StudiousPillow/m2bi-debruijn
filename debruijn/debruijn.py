@@ -102,7 +102,18 @@ def read_fastq(fastq_file: Path) -> Iterator[str]:
     :param fastq_file: (Path) Path to the fastq file.
     :return: A generator object that iterate the read sequences.
     """
-    pass
+    amplicon_file = isfile(amplicon_file)
+    with open(amplicon_file, "rb") as handle:
+        lines = iter(handle.readlines())
+        seq = ''
+        for line in lines:
+            line = line.decode('utf-8').strip()
+            if line.startswith('>'):
+                yield seq
+                seq = ''
+            else:
+                seq = seq + str(line)
+        yield seq
 
 
 def cut_kmer(read: str, kmer_size: int) -> Iterator[str]:
